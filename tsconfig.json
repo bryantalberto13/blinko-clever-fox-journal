@@ -16,7 +16,7 @@
 		"strict": true,
 		"target": "ESNext",
 		"useDefineForClassFields": true,
-		"types": ["node"],
+		"types": ["node", "bun"],
 		"typeRoots": ["./node_modules/@types"]
 	},
 	"include": ["src", "vite.config.ts", "types"]

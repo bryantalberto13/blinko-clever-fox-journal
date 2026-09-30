@@ -15,14 +15,22 @@ A structured AM/PM journaling plugin, inspired by Clever Fox Journal's paper lay
   per-day tag (`#journal/YYYY-MM-DD`) so a single day's AM/PM pair is easy to pull together later.
   Blinko extracts these automatically from note content — no separate tag API call needed.
 
-## Journal Insights (v0.2)
+## v0.3 additions
 
-Third toolbar button (chart icon). Pick 7/14/30 days and hit Analyze: the plugin pulls your
-`#journal/morning` / `#journal/evening` notes (`notes.list` with a date range), groups them by the
-per-day tag, and streams an analysis from your configured Main Chat Model via `ai.completions`
-(RAG and tools off). The prompt covers mood/energy patterns, recurring blockers, goal progress and
-morning-intention vs. evening-reality discrepancies. "Save as note" stores the result tagged
-`#journal/insights`.
+- **Evening pre-fill:** the evening form shows this morning's Daily Focus and turns the weekly goals
+  into a check-off list ("moved forward today"), saved in the note as a `**Goal Check**` section.
+- **Edit in place:** if today's morning/evening entry already exists, the form loads it and saving
+  updates that note instead of creating a duplicate.
+- **Mood & energy:** 1-5 pickers on both forms, saved as `**Mood:** 4/5 | **Energy:** 3/5`.
+- **Journal Insights panel:** streak counter, mood/energy chart, per-goal follow-through bars, and
+  two AI actions over your configured Main Chat Model (`ai.completions`, RAG/tools off):
+  - *Analyze trends* (7/14/30 days): mood patterns, blockers, goal progress, and morning-intention
+    vs. evening-reality discrepancies matched by the `#journal/YYYY-MM-DD` tag.
+  - *Weekly review*: goal completion, wins, time sinks, mood, plus 3 suggested goals. "Use as next
+    week's goals" stores them and pre-fills the first morning form of the new week.
+  - Either result can be saved as a note (`#journal/insights` or `#journal/review`).
+
+Entry parsing/formatting and stats are covered by `bun test`.
 
 ## Not included / out of scope
 

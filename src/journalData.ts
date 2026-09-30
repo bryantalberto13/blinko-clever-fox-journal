@@ -1,9 +1,12 @@
 import { localDateKey } from './dates';
+import { GoalStat } from './stats';
+
+export interface SavedEntry { id: number; content: string }
 
 export interface DayEntries {
   date: string;
-  morning?: string;
-  evening?: string;
+  morning?: SavedEntry;
+  evening?: SavedEntry;
 }
 
 const DAY_TAG = /#journal\/(\d{4}-\d{2}-\d{2})(?=\s|$)/;
@@ -42,17 +45,24 @@ export async function fetchJournalDays(days: number): Promise<DayEntries[]> {
     const date = content.match(DAY_TAG)?.[1] ?? localDateKey(new Date(n.createdAt));
     const day = byDay.get(date) ?? { date };
     // Keep the latest entry if several were written for one slot.
-    if (isMorning) day.morning = content;
-    if (isEvening) day.evening = content;
+    if (isMorning) day.morning = { id: n.id, content };
+    if (isEvening) day.evening = { id: n.id, content };
     byDay.set(date, day);
   }
   return [...byDay.values()].sort((a, b) => a.date.localeCompare(b.date));
+}
+
+/** Today's morning/evening notes (if any), for pre-fill and edit-in-place. */
+export async function fetchToday(): Promise<DayEntries | undefined> {
+  const today = localDateKey();
+  return (await fetchJournalDays(1)).find(d => d.date === today);
 }
 
 const stripTags = (s: string) => s.replace(/#journal\/\S+/g, '').trim();
 
 export const SYSTEM_PROMPT = `You are a warm but honest accountability coach analysing a person's structured journal (Clever Fox style: morning intentions, evening reflections, weekly top-3 goals).
 Be specific, quote short phrases from the entries, and never invent facts. If data is thin, say so.
+Entries may include Mood/Energy ratings (1-5) and evening Goal Check lines (✅ = the goal moved forward that day).
 Respond in Markdown with exactly these sections:
 ## Snapshot
 2-3 sentences on the overall period.
@@ -72,10 +82,45 @@ export function buildQuestion(days: DayEntries[], rangeDays: number): string {
     .map(d => [
       `### ${d.date}`,
       '**MORNING**',
-      d.morning ? stripTags(d.morning) : '_(no morning entry)_',
+      d.morning ? stripTags(d.morning.content) : '_(no morning entry)_',
       '**EVENING**',
-      d.evening ? stripTags(d.evening) : '_(no evening entry)_',
+      d.evening ? stripTags(d.evening.content) : '_(no evening entry)_',
     ].join('\n'))
     .join('\n\n---\n\n');
   return `Analyse my journal entries from the last ${rangeDays} days (${days.length} days with entries).\n\n${body}`;
+}
+
+export const REVIEW_PROMPT = `You are a warm but honest coach running a weekly review of a person's structured journal (morning intentions, evening reflections, weekly top-3 goals with daily goal checks, mood/energy ratings 1-5).
+Be specific, quote short phrases, never invent facts, and say so when data is thin.
+Respond in Markdown with exactly these sections:
+## Week in Brief
+2-3 sentences.
+## Goal Completion
+For each goal: how many days it moved forward (use the provided goal stats) and what the entries say about why.
+## Wins
+The most meaningful wins, grouped by theme.
+## Where the Time Went
+What actually absorbed the week versus what was planned in the morning entries.
+## Mood & Energy
+Patterns and what seemed to move them up or down.
+## Suggested Goals for Next Week
+Exactly 3 numbered goals (one line each, no sub-bullets, no extra commentary in that section), carrying over unfinished goals when still important and choosing realistic scope based on this week's evidence.`;
+
+export function buildReviewQuestion(days: DayEntries[], stats: GoalStat[], avgMood: number | null, avgEnergy: number | null): string {
+  const head = [
+    `Weekly review over the last 7 days (${days.length} days with entries).`,
+    stats.length ? 'Goal stats (days moved forward / days checked):\n' + stats.map(g => `- ${g.goal}: ${g.done}/${g.total}`).join('\n') : 'No goal checks were recorded.',
+    `Average mood: ${avgMood?.toFixed(1) ?? 'n/a'}, average energy: ${avgEnergy?.toFixed(1) ?? 'n/a'} (out of 5).`,
+  ].join('\n\n');
+  return `${head}\n\n${buildQuestion(days, 7).split('\n\n').slice(1).join('\n\n')}`;
+}
+
+/** Pull the 3 numbered goals out of the review's "Suggested Goals for Next Week" section. */
+export function parseSuggestedGoals(md: string): string[] {
+  const m = md.match(/##\s*Suggested Goals for Next Week\s*\n([\s\S]*?)(?=\n##\s|$)/i);
+  if (!m) return [];
+  return m[1].split('\n')
+    .map(l => l.match(/^\s*\d+[.)]\s+(.*\S)/)?.[1]?.replace(/\*\*/g, '').trim())
+    .filter((x): x is string => !!x)
+    .slice(0, 3);
 }
