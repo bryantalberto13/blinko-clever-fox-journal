@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'preact/hooks';
 import type { JSXInternal } from 'preact/src/jsx';
+import { localDateKey, isoWeekKey } from './dates';
 
 const PLUGIN_NAME = 'clever-fox-journal';
 
@@ -16,7 +17,7 @@ function todayLabel(): string {
 }
 
 function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDateKey();
 }
 
 export function JournalForm({ mode, onDone }: Props): JSXInternal.Element {
@@ -40,13 +41,7 @@ export function JournalForm({ mode, onDone }: Props): JSXInternal.Element {
 
   const [saving, setSaving] = useState(false);
 
-  // ISO week key so goals persist for the whole week, then prompt a refresh next week
-  function currentWeekKey(): string {
-    const d = new Date();
-    const onejan = new Date(d.getFullYear(), 0, 1);
-    const week = Math.ceil((((d.getTime() - onejan.getTime()) / 86400000) + onejan.getDay() + 1) / 7);
-    return `${d.getFullYear()}-W${week}`;
-  }
+  const currentWeekKey = isoWeekKey;
 
   useEffect(() => {
     window.Blinko.api.config.getPluginConfig.query({ pluginName: PLUGIN_NAME }).then((res: any) => {

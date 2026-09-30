@@ -15,11 +15,17 @@ A structured AM/PM journaling plugin, inspired by Clever Fox Journal's paper lay
   per-day tag (`#journal/YYYY-MM-DD`) so a single day's AM/PM pair is easy to pull together later.
   Blinko extracts these automatically from note content — no separate tag API call needed.
 
-## Not included yet (out of scope for a Blinko plugin, or planned next)
+## Journal Insights (v0.2)
 
-- **AI trend/accountability analysis** — planned next: a toolbar action that pulls the last 7–30
-  days of `#journal` notes via `window.Blinko.api.notes.list` and sends them to your connected AI
-  model (e.g. Gemini) with an analysis prompt.
+Third toolbar button (chart icon). Pick 7/14/30 days and hit Analyze: the plugin pulls your
+`#journal/morning` / `#journal/evening` notes (`notes.list` with a date range), groups them by the
+per-day tag, and streams an analysis from your configured Main Chat Model via `ai.completions`
+(RAG and tools off). The prompt covers mood/energy patterns, recurring blockers, goal progress and
+morning-intention vs. evening-reality discrepancies. "Save as note" stores the result tagged
+`#journal/insights`.
+
+## Not included / out of scope
+
 - **Handwriting/stylus canvas + OCR** — not feasible with the current plugin API (no canvas
   primitive or OCR pipeline exposed); would require a separate external service.
 - **Calendar integration** — no calendar hook exists in the plugin API; would need a from-scratch

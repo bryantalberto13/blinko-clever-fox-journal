@@ -20,10 +20,12 @@
   },
   "dependencies": {
     "@preact/preset-vite": "^2.10.1",
+    "@trpc/client": "^11.1.0",
     "@types/systemjs": "^6.15.1",
     "@types/ws": "^8.5.10",
     "preact": "^10.26.0",
     "preact-iso": "^2.9.0",
+    "superjson": "^2.2.3",
     "systemjs": "^6.15.1",
     "ws": "^8.16.0"
   }

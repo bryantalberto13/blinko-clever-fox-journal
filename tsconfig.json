@@ -16,8 +16,8 @@
 		"strict": true,
 		"target": "ESNext",
 		"useDefineForClassFields": true,
-		"types": ["blinko", "node"],
-		"typeRoots": ["./types"]
+		"types": ["node"],
+		"typeRoots": ["./node_modules/@types"]
 	},
 	"include": ["src", "vite.config.ts", "types"]
 }
