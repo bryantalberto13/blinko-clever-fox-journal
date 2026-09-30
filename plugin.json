@@ -1,0 +1,16 @@
+{
+  "name": "clever-fox-journal",
+  "author": "bryantalberto13",
+  "url": "",
+  "version": "0.1.0",
+  "minAppVersion": "0.0.0",
+  "displayName": {
+    "default": "Clever Fox Journal"
+  },
+  "description": {
+    "default": "Structured AM/PM journaling: form-based morning & evening entries, auto-tagged (#journal/morning, #journal/evening), a persistent weekly-goals card, and AI-powered trend & accountability analysis over your connected model."
+  },
+  "readme": {
+    "default": "README.md"
+  }
+}

@@ -1,1 +1,37 @@
-# blinko-clever-fox-journal
+# Clever Fox Journal (for Blinko)
+
+A structured AM/PM journaling plugin, inspired by Clever Fox Journal's paper layout.
+
+## What it does (v0.1)
+
+- **Two toolbar buttons** — Morning Journal (sunrise icon) and Evening Journal (crescent icon) —
+  each opens a clean form instead of making you type raw Markdown.
+- **Morning fields:** Daily Focus, Gratitude, Self-Compassion Intention.
+- **Evening fields:** Evening Wins, What Actually Absorbed My Time Today, Reflection / Tomorrow's Focus.
+- **Persistent "Top 3 Weekly Goals"** card: editable each morning, shown read-only each evening,
+  and automatically injected at the top of every morning entry. Stored via the plugin's own
+  config (`window.Blinko.api.config.*`), keyed to the ISO week so it prompts a refresh weekly.
+- **Auto-tagging:** every entry is saved with `#journal/morning` or `#journal/evening`, plus a
+  per-day tag (`#journal/YYYY-MM-DD`) so a single day's AM/PM pair is easy to pull together later.
+  Blinko extracts these automatically from note content — no separate tag API call needed.
+
+## Not included yet (out of scope for a Blinko plugin, or planned next)
+
+- **AI trend/accountability analysis** — planned next: a toolbar action that pulls the last 7–30
+  days of `#journal` notes via `window.Blinko.api.notes.list` and sends them to your connected AI
+  model (e.g. Gemini) with an analysis prompt.
+- **Handwriting/stylus canvas + OCR** — not feasible with the current plugin API (no canvas
+  primitive or OCR pipeline exposed); would require a separate external service.
+- **Calendar integration** — no calendar hook exists in the plugin API; would need a from-scratch
+  integration with your calendar provider's own API.
+
+## Install
+
+1. Zip this folder (or point Blinko's plugin loader at it, per Blinko's plugin dev docs).
+2. In Blinko: Settings → Plugin Setting → Install/Load plugin.
+3. Two new icons appear in the note-editor toolbar.
+
+## Development
+
+Built on the official `blinko-plugin-template` (Preact + SystemJS). See `blinko-plugin-marketplace`
+DEV.md for the standard build/package flow (`bun install && bun run build`, then zip `release/`).
