@@ -124,3 +124,20 @@ export function parseSuggestedGoals(md: string): string[] {
     .filter((x): x is string => !!x)
     .slice(0, 3);
 }
+
+export interface TaggedNote { id: number; content: string; createdAt: string | Date }
+
+/** Recent notes carrying an exact #journal/<tag> tag (newest first). notes.list has no tag filter, so text-search then verify. */
+export async function fetchTagged(tag: string, pages = 3): Promise<TaggedNote[]> {
+  const re = new RegExp(`#journal/${tag}(?=\\s|$)`);
+  const size = 50;
+  const out: TaggedNote[] = [];
+  for (let page = 1; page <= pages; page++) {
+    const batch: any[] = await window.Blinko.api.notes.list.mutate({
+      searchText: `#journal/${tag}`, page, size, orderBy: 'desc', type: -1,
+    });
+    out.push(...batch.filter(n => re.test(n.content ?? '')).map(n => ({ id: n.id, content: n.content, createdAt: n.createdAt })));
+    if (batch.length < size) break;
+  }
+  return out;
+}

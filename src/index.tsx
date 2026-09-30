@@ -4,11 +4,12 @@
 
 import type { BasePlugin } from 'blinko';
 import plugin from '../plugin.json';
-import { installTab, uninstallTab } from './tab';
+import { installTabs, uninstallTabs } from './tab';
 
 /**
- * Clever Fox Journal — a "Personal Check Ins" tab in Blinko's sidebar:
- * guided morning/evening check-ins (mood, energy, goals), history, AI trend analysis and weekly report.
+ * Clever Fox Journal — three sidebar tabs:
+ * Personal Check Ins (guided AM/PM check-ins, history, trend analysis, weekly report),
+ * Guided Journal (fresh AI journaling prompts) and Guided Exploration (framework-based questions).
  */
 System.register([], (exports) => ({
   execute: () => {
@@ -20,11 +21,11 @@ System.register([], (exports) => ({
       withSettingPanel = false;
 
       async init() {
-        installTab('Personal Check Ins');
+        installTabs();
       }
 
       destroy() {
-        uninstallTab();
+        uninstallTabs();
       }
     });
   }

@@ -2,10 +2,11 @@
 
 A structured AM/PM journaling plugin, inspired by Clever Fox Journal's paper layout.
 
-## What it does (v0.4)
+## What it does (v0.5)
 
-A **Personal Check Ins** tab in Blinko's sidebar (after To-dos). Everything lives there; the editor
-toolbar is untouched.
+Three tabs in Blinko's sidebar (after To-dos); the editor toolbar is untouched.
+
+### Personal Check Ins
 
 - **Guided check-ins:** full-page Morning and Evening check-ins (not a popover).
   - Morning: mood, energy, daily focus, gratitude, self-compassion, and your weekly top-3 goals.
@@ -23,11 +24,34 @@ toolbar is untouched.
 - Check-ins are ordinary notes (type Blinko) tagged `#journal/morning` / `#journal/evening` plus
   `#journal/YYYY-MM-DD`, so they also appear in the normal feed and search.
 
-### How the tab is added
+### Guided Journal
 
-Blinko's plugin API has no menu/page hook, so the plugin pushes an entry into
+**✨ Generate a prompt** asks your configured Main Chat Model for one fresh reflective prompt plus two
+"go deeper" questions. Each request is seeded with a random theme and angle and the last few prompts
+(kept in plugin config) so results differ from run to run. Write a response and save it as a note
+tagged `#journal/guided`; earlier entries are listed below.
+
+### Guided Exploration
+
+Describe the problem or thoughts, pick one of four frameworks, and get 3-4 sequential questions:
+
+| Option | Lens | Best for |
+|---|---|---|
+| 1 The Thought-Loop Untangler | CBT | Negative thinking, worry, self-doubt |
+| 2 The Deep-Dive Chain Reaction | DBT | A specific reaction or impulsive behavior |
+| 3 The Value & Meaning Alignment | ACT | Feeling stuck, avoiding hard choices |
+| 4 The Root Pattern Tracer | Psychodynamic | The same problem recurring |
+
+The system prompt (`src/prompts.ts`) is the framework template with a safety line: if someone
+describes a crisis, the model is told to respond with care and point to real support instead of
+running the exercise. Answers can be saved as a note tagged `#journal/exploration`. This is a
+self-reflection tool, not therapy.
+
+### How the tabs are added
+
+Blinko's plugin API has no menu/page hook, so the plugin pushes entries into
 `window.Blinko.store.baseStore.routerList` (what the sidebar renders) and, while the URL is
-`/?path=checkins`, mounts its page inside Blinko's `.layout-container`. This relies on Blinko
+`/?path=<tab>`, mounts that tab's page inside Blinko's `.layout-container`. This relies on Blinko
 internals and may need adjusting after major Blinko UI changes.
 
 ## Not included / out of scope

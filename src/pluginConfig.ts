@@ -44,3 +44,13 @@ export async function saveNextWeekGoals(goals: string[]): Promise<void> {
   await set('nextWeekGoals', JSON.stringify(pad3(goals)));
   await set('nextWeekFor', isoWeekKey(d));
 }
+
+export async function loadRecentPrompts(): Promise<string[]> {
+  const res: any = await window.Blinko.api.config.getPluginConfig.query({ pluginName: PLUGIN_NAME });
+  const v = parse(res?.recentPrompts);
+  return Array.isArray(v) ? v.map(String) : [];
+}
+
+export async function saveRecentPrompts(prompts: string[]): Promise<void> {
+  await set('recentPrompts', JSON.stringify(prompts.slice(-20)));
+}

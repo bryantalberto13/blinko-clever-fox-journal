@@ -74,3 +74,19 @@ test('entryDate and parseGoalsList', () => {
   expect(parseGoalsList(t)).toEqual(['A', 'B']);
   expect(entryDate('no tag')).toBeNull();
 });
+
+import { buildJournalRequest, buildExplorationRequest, FRAMEWORKS, EXPLORATION_SYSTEM, mainPrompt, THEMES } from './prompts';
+test('guided prompts', () => {
+  const first = buildJournalRequest([], () => 0);
+  expect(first).toContain(THEMES[0]);
+  expect(first).not.toContain('Earlier prompts');
+  const req = buildJournalRequest(['What did you avoid today?'], () => 0.99);
+  expect(req).toContain('- What did you avoid today?');
+  expect(req).toContain(THEMES[THEMES.length - 1]);
+  expect(new Set(Array.from({ length: 30 }, (_, i) => buildJournalRequest([], () => (i * 7919 % 100) / 100))).size).toBeGreaterThan(5);
+  expect(FRAMEWORKS.map(f => f.num)).toEqual([1, 2, 3, 4]);
+  for (const f of FRAMEWORKS) expect(EXPLORATION_SYSTEM).toContain(f.method);
+  expect(EXPLORATION_SYSTEM).not.toContain('wait for the user');
+  expect(buildExplorationRequest(FRAMEWORKS[2], ' procrastinating ')).toBe('Selected option: 3 (The Value & Meaning Alignment)\nBrief topic: procrastinating');
+  expect(mainPrompt('Main?\n\nGo deeper:\n- a')).toBe('Main?');
+});

@@ -1,5 +1,5 @@
 /** Scoped styles. Blinko's Tailwind is precompiled, so plugin UI can't rely on utility classes. */
-export const CSS = `
+export const CSS_BASE = `
 #cf-root{--cf-accent:#f97316;--cf-line:rgba(128,128,128,.28);--cf-soft:rgba(128,128,128,.07);
   width:100%;max-width:880px;margin:0 auto;padding:16px 20px 56px;box-sizing:border-box;font-size:14px;line-height:1.5;position:relative;z-index:1}
 #cf-root *{box-sizing:border-box}
@@ -51,3 +51,12 @@ export const CSS = `
 #cf-root .cf-strip div{display:flex;flex-direction:column;align-items:center;font-size:11px;opacity:.9;min-width:34px}
 #cf-root .cf-strip .em{font-size:20px}
 `;
+export const CSS_EXTRA = `
+#cf-root .cf-fws{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+#cf-root .cf-fw{text-align:left;padding:12px 14px;border-radius:12px;border:1px solid var(--cf-line);background:transparent}
+#cf-root .cf-fw .t{font-weight:700;margin-bottom:2px}
+#cf-root .cf-fw .e{font-size:18px}
+#cf-root .cf-fw:hover{border-color:var(--cf-accent)}
+#cf-root .cf-fw.on{border-color:var(--cf-accent);background:rgba(249,115,22,.14)}
+`;
+export const CSS = CSS_BASE + CSS_EXTRA;
