@@ -1,4 +1,5 @@
 import { localDateKey } from './dates';
+import { MOODS, ENERGIES, findOption, optionText, parseOption } from './moods';
 
 export type Mode = 'morning' | 'evening';
 
@@ -13,8 +14,8 @@ export interface EntryFields {
   reflection: string;
   goalChecks: boolean[]; // evening: did today move goal i forward
   // both
-  mood: number | null; // 1-5
-  energy: number | null; // 1-5
+  mood: string | null; // key from MOODS
+  energy: string | null; // key from ENERGIES
 }
 
 export const emptyFields = (): EntryFields => ({
@@ -33,8 +34,10 @@ export function todayLabel(d = new Date()): string {
 }
 
 function moodLine(f: EntryFields): string | null {
-  if (f.mood == null && f.energy == null) return null;
-  return `**Mood:** ${f.mood ?? '-'}/5 | **Energy:** ${f.energy ?? '-'}/5`;
+  const m = findOption(MOODS, f.mood);
+  const e = findOption(ENERGIES, f.energy);
+  if (!m && !e) return null;
+  return `**Mood:** ${m ? optionText(m) : '-'} | **Energy:** ${e ? optionText(e) : '-'}`;
 }
 
 export function buildEntry(mode: Mode, f: EntryFields, goals: string[], date = new Date()): string {
@@ -94,10 +97,34 @@ export function parseGoalChecks(content: string): ParsedGoalCheck[] {
     .map(m => ({ goal: m[1], done: m[2] === '✅' }));
 }
 
-export function parseMood(content: string): { mood: number | null; energy: number | null } {
-  const m = content.match(/\*\*Mood:\*\*\s*(\d)\/5/);
-  const e = content.match(/\*\*Energy:\*\*\s*(\d)\/5/);
-  return { mood: m ? Number(m[1]) : null, energy: e ? Number(e[1]) : null };
+export interface ParsedMood {
+  mood: string | null;
+  energy: string | null;
+  /** 1-5 valence for charts; also populated for legacy "4/5" entries. */
+  moodScore: number | null;
+  energyScore: number | null;
+}
+
+export function parseMood(content: string): ParsedMood {
+  const m = content.match(/\*\*Mood:\*\*\s*([^|\n]*)/);
+  const e = content.match(/\*\*Energy:\*\*\s*([^|\n]*)/);
+  const pm = m ? parseOption(MOODS, m[1]) : { key: null, score: null };
+  const pe = e ? parseOption(ENERGIES, e[1]) : { key: null, score: null };
+  return { mood: pm.key, energy: pe.key, moodScore: pm.score, energyScore: pe.score };
+}
+
+/** Goal texts from a morning entry's "This Week's Top 3 Goals" list. */
+export function parseGoalsList(content: string): string[] {
+  return getSection(content, "This Week's Top 3 Goals")
+    .split('\n')
+    .map(l => l.match(/^\d+\.\s+(.*\S)/)?.[1])
+    .filter((x): x is string => !!x);
+}
+
+/** Local date of an entry from its #journal/YYYY-MM-DD tag. */
+export function entryDate(content: string): Date | null {
+  const m = content.match(/#journal\/(\d{4})-(\d{2})-(\d{2})(?=\s|$)/);
+  return m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : null;
 }
 
 /** Rebuild form state from a saved entry so it can be edited. Goals come from plugin config, matched by text. */

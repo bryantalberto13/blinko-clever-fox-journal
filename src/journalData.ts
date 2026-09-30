@@ -62,7 +62,7 @@ const stripTags = (s: string) => s.replace(/#journal\/\S+/g, '').trim();
 
 export const SYSTEM_PROMPT = `You are a warm but honest accountability coach analysing a person's structured journal (Clever Fox style: morning intentions, evening reflections, weekly top-3 goals).
 Be specific, quote short phrases from the entries, and never invent facts. If data is thin, say so.
-Entries may include Mood/Energy ratings (1-5) and evening Goal Check lines (✅ = the goal moved forward that day).
+Entries may include Mood and Energy descriptors (e.g. "😊 Content", "🪫 Low"; older entries may use N/5 ratings) and evening Goal Check lines (✅ = the goal moved forward that day).
 Respond in Markdown with exactly these sections:
 ## Snapshot
 2-3 sentences on the overall period.
@@ -90,7 +90,7 @@ export function buildQuestion(days: DayEntries[], rangeDays: number): string {
   return `Analyse my journal entries from the last ${rangeDays} days (${days.length} days with entries).\n\n${body}`;
 }
 
-export const REVIEW_PROMPT = `You are a warm but honest coach running a weekly review of a person's structured journal (morning intentions, evening reflections, weekly top-3 goals with daily goal checks, mood/energy ratings 1-5).
+export const REVIEW_PROMPT = `You are a warm but honest coach running a weekly review of a person's structured journal (morning intentions, evening reflections, weekly top-3 goals with daily goal checks, mood and energy descriptors such as "😰 Anxious" or "🪫 Low").
 Be specific, quote short phrases, never invent facts, and say so when data is thin.
 Respond in Markdown with exactly these sections:
 ## Week in Brief
@@ -110,7 +110,7 @@ export function buildReviewQuestion(days: DayEntries[], stats: GoalStat[], avgMo
   const head = [
     `Weekly review over the last 7 days (${days.length} days with entries).`,
     stats.length ? 'Goal stats (days moved forward / days checked):\n' + stats.map(g => `- ${g.goal}: ${g.done}/${g.total}`).join('\n') : 'No goal checks were recorded.',
-    `Average mood: ${avgMood?.toFixed(1) ?? 'n/a'}, average energy: ${avgEnergy?.toFixed(1) ?? 'n/a'} (out of 5).`,
+    `Average mood score: ${avgMood?.toFixed(1) ?? 'n/a'}, average energy score: ${avgEnergy?.toFixed(1) ?? 'n/a'} (1 = lowest, 5 = highest).`,
   ].join('\n\n');
   return `${head}\n\n${buildQuestion(days, 7).split('\n\n').slice(1).join('\n\n')}`;
 }

@@ -2,35 +2,33 @@
 
 A structured AM/PM journaling plugin, inspired by Clever Fox Journal's paper layout.
 
-## What it does (v0.1)
+## What it does (v0.4)
 
-- **Two toolbar buttons** — Morning Journal (sunrise icon) and Evening Journal (crescent icon) —
-  each opens a clean form instead of making you type raw Markdown.
-- **Morning fields:** Daily Focus, Gratitude, Self-Compassion Intention.
-- **Evening fields:** Evening Wins, What Actually Absorbed My Time Today, Reflection / Tomorrow's Focus.
-- **Persistent "Top 3 Weekly Goals"** card: editable each morning, shown read-only each evening,
-  and automatically injected at the top of every morning entry. Stored via the plugin's own
-  config (`window.Blinko.api.config.*`), keyed to the ISO week so it prompts a refresh weekly.
-- **Auto-tagging:** every entry is saved with `#journal/morning` or `#journal/evening`, plus a
-  per-day tag (`#journal/YYYY-MM-DD`) so a single day's AM/PM pair is easy to pull together later.
-  Blinko extracts these automatically from note content — no separate tag API call needed.
+A **Personal Check Ins** tab in Blinko's sidebar (after To-dos). Everything lives there; the editor
+toolbar is untouched.
 
-## v0.3 additions
+- **Guided check-ins:** full-page Morning and Evening check-ins (not a popover).
+  - Morning: mood, energy, daily focus, gratitude, self-compassion, and your weekly top-3 goals.
+  - Evening: mood, energy, this morning's plan for reference, a goal check-off list, wins, what
+    absorbed your time, and reflection.
+- **Descriptive moods with icons:** 😄 Joyful, 🥰 Grateful, 🤩 Motivated, 😊 Content, 😌 Calm,
+  🙂 Hopeful, 😐 Neutral, 😴 Tired, 😰 Anxious, 😤 Frustrated, 😔 Sad, 😩 Overwhelmed; energy:
+  ⚡ Charged, 🔥 Energized, 🔋 Steady, 🪫 Low, 💤 Drained. Stored as text
+  (`**Mood:** 😊 Content | **Energy:** 🪫 Low`); older `N/5` entries still parse.
+- **Dashboard:** today's status, streak, last-14-days mood strip and chart, goal follow-through,
+  and a history list where any check-in can be edited in place (no duplicates).
+- **📈 Analyze trends** (7/14/30 days) and **📅 Weekly report**, run over your configured Main Chat
+  Model (`ai.completions`, RAG/tools off). The report suggests 3 goals; "Use as next week's goals"
+  pre-fills the first morning check-in of the new week. Results can be saved as notes.
+- Check-ins are ordinary notes (type Blinko) tagged `#journal/morning` / `#journal/evening` plus
+  `#journal/YYYY-MM-DD`, so they also appear in the normal feed and search.
 
-- **Evening pre-fill:** the evening form shows this morning's Daily Focus and turns the weekly goals
-  into a check-off list ("moved forward today"), saved in the note as a `**Goal Check**` section.
-- **Edit in place:** if today's morning/evening entry already exists, the form loads it and saving
-  updates that note instead of creating a duplicate.
-- **Mood & energy:** 1-5 pickers on both forms, saved as `**Mood:** 4/5 | **Energy:** 3/5`.
-- **Journal Insights panel:** streak counter, mood/energy chart, per-goal follow-through bars, and
-  two AI actions over your configured Main Chat Model (`ai.completions`, RAG/tools off):
-  - *Analyze trends* (7/14/30 days): mood patterns, blockers, goal progress, and morning-intention
-    vs. evening-reality discrepancies matched by the `#journal/YYYY-MM-DD` tag.
-  - *Weekly review*: goal completion, wins, time sinks, mood, plus 3 suggested goals. "Use as next
-    week's goals" stores them and pre-fills the first morning form of the new week.
-  - Either result can be saved as a note (`#journal/insights` or `#journal/review`).
+### How the tab is added
 
-Entry parsing/formatting and stats are covered by `bun test`.
+Blinko's plugin API has no menu/page hook, so the plugin pushes an entry into
+`window.Blinko.store.baseStore.routerList` (what the sidebar renders) and, while the URL is
+`/?path=checkins`, mounts its page inside Blinko's `.layout-container`. This relies on Blinko
+internals and may need adjusting after major Blinko UI changes.
 
 ## Not included / out of scope
 

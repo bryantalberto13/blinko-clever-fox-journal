@@ -12,7 +12,13 @@ export function streak(days: DayEntries[], today = new Date()): number {
   return n;
 }
 
-export interface MoodPoint { date: string; mood: number | null; energy: number | null }
+export interface MoodPoint {
+  date: string;
+  mood: number | null;
+  energy: number | null;
+  morningMood: string | null;
+  eveningMood: string | null;
+}
 
 const avg = (xs: (number | null)[]): number | null => {
   const v = xs.filter((x): x is number => x != null);
@@ -22,9 +28,15 @@ const avg = (xs: (number | null)[]): number | null => {
 /** Per-day mood/energy, averaging morning and evening ratings when both exist. */
 export function moodSeries(days: DayEntries[]): MoodPoint[] {
   return days.map(d => {
-    const m = d.morning ? parseMood(d.morning.content) : { mood: null, energy: null };
-    const e = d.evening ? parseMood(d.evening.content) : { mood: null, energy: null };
-    return { date: d.date, mood: avg([m.mood, e.mood]), energy: avg([m.energy, e.energy]) };
+    const m = d.morning ? parseMood(d.morning.content) : null;
+    const e = d.evening ? parseMood(d.evening.content) : null;
+    return {
+      date: d.date,
+      mood: avg([m?.moodScore ?? null, e?.moodScore ?? null]),
+      energy: avg([m?.energyScore ?? null, e?.energyScore ?? null]),
+      morningMood: m?.mood ?? null,
+      eveningMood: e?.mood ?? null,
+    };
   });
 }
 
